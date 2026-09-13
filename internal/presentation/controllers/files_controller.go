@@ -5,8 +5,8 @@ import (
 
 	"github.com/sudzekai-web-os/abstractions"
 	"github.com/sudzekai-web-os/files-module/internal/application/queries"
-	"github.com/sudzekai-web-os/files-module/internal/interfaces"
 	"github.com/sudzekai-web-os/files-module/internal/objects/file"
+	"github.com/sudzekai-web-os/files-module/internal/presentation/interfaces"
 	querydispatcher "github.com/sudzekai-web-os/mediator/querydispatcher"
 	"github.com/sudzekai-web-os/types"
 )
