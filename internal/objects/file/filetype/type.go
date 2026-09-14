@@ -1,4 +1,4 @@
-package filetypes
+package filetype
 
 type FileType string
 

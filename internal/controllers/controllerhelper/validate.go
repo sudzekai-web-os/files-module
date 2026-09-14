@@ -1,4 +1,4 @@
-package controllers
+package controllerhelper
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func validateFilePath(path string) error {
+func ValidateFilePath(path string) error {
 	if path == "" {
 		return fmt.Errorf("путь к файлу не может быть пустым")
 	}

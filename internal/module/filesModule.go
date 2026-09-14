@@ -2,8 +2,8 @@ package module
 
 import (
 	"github.com/sudzekai-web-os/abstractions"
-	"github.com/sudzekai-web-os/files-module/internal/application/handlers"
-	"github.com/sudzekai-web-os/files-module/internal/presentation/controllers"
+	"github.com/sudzekai-web-os/files-module/internal/controllers/filescontroller"
+	"github.com/sudzekai-web-os/files-module/internal/dispatchering/getfileinfo"
 	"github.com/sudzekai-web-os/mediator"
 )
 
@@ -23,7 +23,7 @@ func (m *FilesModule) Description() string {
 }
 
 func (m *FilesModule) Version() string {
-	return "v0.0.1"
+	return "v0.1.0"
 }
 
 func (m *FilesModule) Initialize(
@@ -41,9 +41,9 @@ func configureFilesControllerChain(
 	loggerFactory abstractions.ILoggerFactory,
 	executor abstractions.IExecutor,
 ) {
-	mediator.RegisterHandler(handlers.NewGetFileInfoQueryHandler(loggerFactory, executor))
+	mediator.RegisterHandler(getfileinfo.NewHandler(loggerFactory, executor))
 
-	filesController := controllers.NewFilesController(loggerFactory)
+	filesController := filescontroller.New(loggerFactory)
 
 	filesController.AddRoutes(registry)
 }
