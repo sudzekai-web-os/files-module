@@ -1,20 +1,21 @@
 package file
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/sudzekai-web-os/files-module/internal/objects/file/filepermissions"
-	"github.com/sudzekai-web-os/files-module/internal/objects/file/filetypes"
-	"github.com/sudzekai-web-os/files-module/internal/objects/statcommand/statkeypatterns"
+	"github.com/sudzekai-web-os/files-module/internal/objects/file/filepermission"
+	"github.com/sudzekai-web-os/files-module/internal/objects/file/filetype"
+	"github.com/sudzekai-web-os/files-module/internal/objects/statcommand/statformat"
 )
 
 type FileInfo struct {
 	Name     string
 	FullName string
 
-	Type filetypes.FileType
+	Type filetype.FileType
 
 	Size      int64
 	Inode     uint64
@@ -32,10 +33,10 @@ type FileInfo struct {
 
 	LinkTarget string
 
-	SpecialPermissions []filepermissions.FilePermission
-	UserPermissions    []filepermissions.FilePermission
-	GroupPermissions   []filepermissions.FilePermission
-	OthersPermissions  []filepermissions.FilePermission
+	SpecialPermissions []filepermission.FilePermission
+	UserPermissions    []filepermission.FilePermission
+	GroupPermissions   []filepermission.FilePermission
+	OthersPermissions  []filepermission.FilePermission
 
 	BirthDateTime        time.Time
 	ModificationDateTime time.Time
@@ -102,144 +103,147 @@ func (fi *FileInfo) construct() {
 }
 
 func (fi *FileInfo) getName() string {
-	return fi.stats["Name"]
+	return filepath.Base(fi.stats[statformat.Name.Key])
 }
 
+// подразумевается что передаваемый в stat параметр изначально имеет полный путь к файлу
+// что подтверждается валидацией query параметра fullPath у метода GetFileInfo контроллера FilesController
+// в связи с чем FullName - результат вывода замены паттерна %n, а name - название конкретного файла
 func (fi *FileInfo) getFullName() string {
-	return fi.stats["FullName"]
+	return fi.stats[statformat.Name.Key]
 }
 
-func (fi *FileInfo) getType() filetypes.FileType {
+func (fi *FileInfo) getType() filetype.FileType {
 	typeStr := fi.stats["Type"]
 
 	if typeStr == "" {
-		return filetypes.Unknown
+		return filetype.Unknown
 	}
 
 	switch typeStr {
 	case "regular file":
-		return filetypes.Regular
+		return filetype.Regular
 	case "directory":
-		return filetypes.Directory
+		return filetype.Directory
 	case "symbolic link":
-		return filetypes.Symlink
+		return filetype.Symlink
 	case "socket":
-		return filetypes.Socket
+		return filetype.Socket
 	case "fifo":
-		return filetypes.Pipe
+		return filetype.Pipe
 	case "block special file":
-		return filetypes.BlockDevice
+		return filetype.BlockDevice
 	case "character special file":
-		return filetypes.CharacterDevice
+		return filetype.CharacterDevice
 	default:
-		return filetypes.Unknown
+		return filetype.Unknown
 	}
 }
 
 func (fi *FileInfo) getSize() int64 {
-	sizeStr := fi.stats[statkeypatterns.Size.Key]
+	sizeStr := fi.stats[statformat.Size.Key]
 	size, _ := strconv.ParseInt(sizeStr, 10, 64)
 	return size
 }
 
 func (fi *FileInfo) getInode() uint64 {
-	inodeStr := fi.stats[statkeypatterns.Inode.Key]
+	inodeStr := fi.stats[statformat.Inode.Key]
 	inode, _ := strconv.ParseUint(inodeStr, 10, 64)
 	return inode
 }
 
 func (fi *FileInfo) getLinks() uint64 {
-	linksStr := fi.stats[statkeypatterns.Links.Key]
+	linksStr := fi.stats[statformat.Links.Key]
 	links, _ := strconv.ParseUint(linksStr, 10, 64)
 	return links
 }
 
 func (fi *FileInfo) getDeviceId() uint64 {
-	deviceIDStr := fi.stats[statkeypatterns.DeviceID.Key]
+	deviceIDStr := fi.stats[statformat.DeviceID.Key]
 	deviceID, _ := strconv.ParseUint(deviceIDStr, 10, 64)
 	return deviceID
 }
 
 func (fi *FileInfo) getRDevice() uint64 {
-	rDeviceStr := fi.stats[statkeypatterns.RDevice.Key]
+	rDeviceStr := fi.stats[statformat.RDevice.Key]
 	rDevice, _ := strconv.ParseUint(rDeviceStr, 10, 64)
 	return rDevice
 }
 
 func (fi *FileInfo) getBlockSize() int64 {
-	blockSizeStr := fi.stats[statkeypatterns.BlockSize.Key]
+	blockSizeStr := fi.stats[statformat.BlockSize.Key]
 	blockSize, _ := strconv.ParseInt(blockSizeStr, 10, 64)
 	return blockSize
 }
 
 func (fi *FileInfo) getBlocks() int64 {
-	blocksStr := fi.stats[statkeypatterns.Blocks.Key]
+	blocksStr := fi.stats[statformat.Blocks.Key]
 	blocks, _ := strconv.ParseInt(blocksStr, 10, 64)
 	return blocks
 }
 
 func (fi *FileInfo) getOwner() string {
-	return fi.stats[statkeypatterns.Owner.Key]
+	return fi.stats[statformat.Owner.Key]
 }
 
 func (fi *FileInfo) getOwnerID() uint32 {
-	ownerIDStr := fi.stats[statkeypatterns.OwnerID.Key]
+	ownerIDStr := fi.stats[statformat.OwnerID.Key]
 	ownerID, _ := strconv.ParseUint(ownerIDStr, 10, 32)
 	return uint32(ownerID)
 }
 
 func (fi *FileInfo) getGroup() string {
-	return fi.stats[statkeypatterns.Group.Key]
+	return fi.stats[statformat.Group.Key]
 }
 
 func (fi *FileInfo) getGroupID() uint32 {
-	groupIDStr := fi.stats[statkeypatterns.GroupID.Key]
+	groupIDStr := fi.stats[statformat.GroupID.Key]
 	groupID, _ := strconv.ParseUint(groupIDStr, 10, 32)
 	return uint32(groupID)
 }
 
 func (fi *FileInfo) getLinkTarget() string {
-	return fi.stats[statkeypatterns.LinkTarget.Key]
+	return fi.stats[statformat.LinkTarget.Key]
 }
 
-func (fi *FileInfo) getSpecialPermissions(permissions map[string][]filepermissions.FilePermission) []filepermissions.FilePermission {
-	return permissions[statkeypatterns.SpecialPermissions.Key]
+func (fi *FileInfo) getSpecialPermissions(permissions map[string][]filepermission.FilePermission) []filepermission.FilePermission {
+	return permissions[statformat.SpecialPermissions.Key]
 }
 
-func (fi *FileInfo) getUserPermissions(permissions map[string][]filepermissions.FilePermission) []filepermissions.FilePermission {
-	return permissions[statkeypatterns.UserPermissions.Key]
+func (fi *FileInfo) getUserPermissions(permissions map[string][]filepermission.FilePermission) []filepermission.FilePermission {
+	return permissions[statformat.UserPermissions.Key]
 }
 
-func (fi *FileInfo) getGroupPermissions(permissions map[string][]filepermissions.FilePermission) []filepermissions.FilePermission {
-	return permissions[statkeypatterns.GroupPermissions.Key]
+func (fi *FileInfo) getGroupPermissions(permissions map[string][]filepermission.FilePermission) []filepermission.FilePermission {
+	return permissions[statformat.GroupPermissions.Key]
 }
 
-func (fi *FileInfo) getOthersPermissions(permissions map[string][]filepermissions.FilePermission) []filepermissions.FilePermission {
-	return permissions[statkeypatterns.OthersPermissions.Key]
+func (fi *FileInfo) getOthersPermissions(permissions map[string][]filepermission.FilePermission) []filepermission.FilePermission {
+	return permissions[statformat.OthersPermissions.Key]
 }
 
 func (fi *FileInfo) getBirthDateTime() time.Time {
-	return parseUnixString(fi.stats[statkeypatterns.BirthDateTime.Key])
+	return parseUnixString(fi.stats[statformat.BirthDateTime.Key])
 }
 
 func (fi *FileInfo) getModificationDateTime() time.Time {
-	return parseUnixString(fi.stats[statkeypatterns.ModificationDateTime.Key])
+	return parseUnixString(fi.stats[statformat.ModificationDateTime.Key])
 }
 
 func (fi *FileInfo) getChangeDateTime() time.Time {
-	return parseUnixString(fi.stats[statkeypatterns.ChangeDateTime.Key])
+	return parseUnixString(fi.stats[statformat.ChangeDateTime.Key])
 }
 
 func (fi *FileInfo) getAccessDateTime() time.Time {
-	return parseUnixString(fi.stats[statkeypatterns.AccessDateTime.Key])
+	return parseUnixString(fi.stats[statformat.AccessDateTime.Key])
 }
 
 func (fi *FileInfo) getPermissions() string {
-	return fi.stats[statkeypatterns.Permissions.Key]
+	return fi.stats[statformat.Permissions.Key]
 }
 
-func parsePermissions(permissionsStr string) map[string][]filepermissions.FilePermission {
-	result := make(map[string][]filepermissions.FilePermission)
+func parsePermissions(permissionsStr string) map[string][]filepermission.FilePermission {
+	result := make(map[string][]filepermission.FilePermission)
 
 	if permissionsStr == "" {
 		return result
@@ -252,7 +256,7 @@ func parsePermissions(permissionsStr string) map[string][]filepermissions.FilePe
 	}
 
 	for i := 0; i < 4; i++ {
-		perms := make([]filepermissions.FilePermission, 0, 3)
+		perms := make([]filepermission.FilePermission, 0, 3)
 
 		if chars[i] == '0' {
 			continue
@@ -262,33 +266,33 @@ func parsePermissions(permissionsStr string) map[string][]filepermissions.FilePe
 
 		if i != 0 {
 			if perm&4 != 0 {
-				perms = append(perms, filepermissions.Read)
+				perms = append(perms, filepermission.Read)
 			}
 			if perm&2 != 0 {
-				perms = append(perms, filepermissions.Write)
+				perms = append(perms, filepermission.Write)
 			}
 			if perm&1 != 0 {
-				perms = append(perms, filepermissions.Execute)
+				perms = append(perms, filepermission.Execute)
 			}
 		} else {
 			if perm&4 != 0 {
-				perms = append(perms, filepermissions.Setuid)
+				perms = append(perms, filepermission.Setuid)
 			}
 
 			if perm&2 != 0 {
-				perms = append(perms, filepermissions.Setgid)
+				perms = append(perms, filepermission.Setgid)
 			}
 
 			if perm&1 != 0 {
-				perms = append(perms, filepermissions.Sticky)
+				perms = append(perms, filepermission.Sticky)
 			}
 		}
 
 		keys := []string{
-			statkeypatterns.SpecialPermissions.Key,
-			statkeypatterns.UserPermissions.Key,
-			statkeypatterns.GroupPermissions.Key,
-			statkeypatterns.OthersPermissions.Key,
+			statformat.SpecialPermissions.Key,
+			statformat.UserPermissions.Key,
+			statformat.GroupPermissions.Key,
+			statformat.OthersPermissions.Key,
 		}
 
 		result[keys[i]] = perms

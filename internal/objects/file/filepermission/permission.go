@@ -1,4 +1,4 @@
-package filepermissions
+package filepermission
 
 type FilePermission string
 
