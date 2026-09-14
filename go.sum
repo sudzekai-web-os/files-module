@@ -6,5 +6,7 @@ github.com/sudzekai-web-os/mediator v1.0.0 h1:jvrL3FU42eYz/CYNsRwLQ02wP5OJJTijdX
 github.com/sudzekai-web-os/mediator v1.0.0/go.mod h1:3zsCz3v3pc7oeJ6gvigq2BfAv/ijG8n9KCcP0SETBRE=
 github.com/sudzekai-web-os/mediator v1.0.4 h1:Ap/PdCZS6ijEOFmaLPHfFKUMleV6tcmgXVvDURvsxjg=
 github.com/sudzekai-web-os/mediator v1.0.4/go.mod h1:3zsCz3v3pc7oeJ6gvigq2BfAv/ijG8n9KCcP0SETBRE=
+github.com/sudzekai-web-os/mediator v1.1.0 h1:TG23vquJ1a6943jBWlCXRuidklYAVdTyZUy2Ev+JMuU=
+github.com/sudzekai-web-os/mediator v1.1.0/go.mod h1:3zsCz3v3pc7oeJ6gvigq2BfAv/ijG8n9KCcP0SETBRE=
 github.com/sudzekai-web-os/types v1.0.4 h1:3W5FgFJ/4/sT2yCLYkevy/Pfk3NSQvqpFv5LeF9z+iw=
 github.com/sudzekai-web-os/types v1.0.4/go.mod h1:Jn/g3qidr+vtt+xVwEPdzIwe0eQ2p7xH9OZe/weiWZ0=

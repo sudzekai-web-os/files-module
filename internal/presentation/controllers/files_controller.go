@@ -5,20 +5,21 @@ import (
 
 	"github.com/sudzekai-web-os/abstractions"
 	"github.com/sudzekai-web-os/files-module/internal/application/queries"
-	"github.com/sudzekai-web-os/files-module/internal/objects/file"
 	"github.com/sudzekai-web-os/files-module/internal/presentation/interfaces"
-	querydispatcher "github.com/sudzekai-web-os/mediator/querydispatcher"
+	"github.com/sudzekai-web-os/mediator"
 	"github.com/sudzekai-web-os/types"
 )
 
 type FilesContoller struct {
+	loggerFactory abstractions.ILoggerFactory
 }
 
 func NewFilesController(
 	loggerFactory abstractions.ILoggerFactory,
-	executor abstractions.IExecutor,
 ) interfaces.IFilesController {
-	return &FilesContoller{}
+	return &FilesContoller{
+		loggerFactory: loggerFactory,
+	}
 }
 
 func (fc *FilesContoller) AddRoutes(registry abstractions.IHandlersRegistry) {
@@ -36,7 +37,18 @@ func (fc *FilesContoller) GetFileInfo(r *http.Request) (result types.HandlerResu
 		return
 	}
 
-	queryResult, err := querydispatcher.Query[*queries.GetFileInfoQuery, *file.FileInfo](queries.NewGetFileInfoQuery(filePath))
+	var queryResult queries.GetFileInfoQueryResult
+
+	err = mediator.Dispatch(queries.NewGetFileInfoQuery(filePath), &queryResult)
+
+	if err != nil {
+		log := fc.loggerFactory.NewLogger("files-module:get-file-info")
+		log.LogError("%s", err.Error())
+
+		result.Data = "Внутренняя ошибка сервера"
+		result.StatusCode = 500
+		return
+	}
 
 	result.Data = queryResult
 	result.StatusCode = 200

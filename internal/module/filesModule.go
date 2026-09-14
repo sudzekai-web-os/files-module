@@ -2,9 +2,9 @@ package module
 
 import (
 	"github.com/sudzekai-web-os/abstractions"
-	queryhandlers "github.com/sudzekai-web-os/files-module/internal/application/query_handlers"
+	"github.com/sudzekai-web-os/files-module/internal/application/handlers"
 	"github.com/sudzekai-web-os/files-module/internal/presentation/controllers"
-	querydispatcher "github.com/sudzekai-web-os/mediator/querydispatcher"
+	"github.com/sudzekai-web-os/mediator"
 )
 
 type FilesModule struct {
@@ -41,8 +41,9 @@ func configureFilesControllerChain(
 	loggerFactory abstractions.ILoggerFactory,
 	executor abstractions.IExecutor,
 ) {
-	querydispatcher.RegisterHandler(queryhandlers.NewGetFileInfoQueryHandler(loggerFactory, executor))
+	mediator.RegisterHandler(handlers.NewGetFileInfoQueryHandler(loggerFactory, executor))
 
-	filesController := controllers.NewFilesController(loggerFactory, executor)
+	filesController := controllers.NewFilesController(loggerFactory)
+
 	filesController.AddRoutes(registry)
 }

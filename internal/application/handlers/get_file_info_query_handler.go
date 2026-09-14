@@ -1,4 +1,4 @@
-package queryhandlers
+package handlers
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/sudzekai-web-os/files-module/internal/application/queries"
 	"github.com/sudzekai-web-os/files-module/internal/objects/file"
 	"github.com/sudzekai-web-os/files-module/internal/objects/statcommand/statkeypatterns"
-	mediator "github.com/sudzekai-web-os/mediator/abstractions"
+	"github.com/sudzekai-web-os/mediator"
 )
 
 type GetFileInfoQueryHandler struct {
@@ -19,7 +19,7 @@ type GetFileInfoQueryHandler struct {
 func NewGetFileInfoQueryHandler(
 	loggerFactory abstractions.ILoggerFactory,
 	executor abstractions.IExecutor,
-) mediator.IQueryHandler[queries.GetFileInfoQuery, *file.FileInfo] {
+) mediator.IHandler[queries.GetFileInfoQuery, queries.GetFileInfoQueryResult] {
 	logger := loggerFactory.NewLogger("queries:get-file-info")
 	return &GetFileInfoQueryHandler{
 		logger:   logger,
@@ -27,8 +27,9 @@ func NewGetFileInfoQueryHandler(
 	}
 }
 
-func (h *GetFileInfoQueryHandler) Handle(query queries.GetFileInfoQuery) (*file.FileInfo, error) {
+func (h *GetFileInfoQueryHandler) Handle(query queries.GetFileInfoQuery) queries.GetFileInfoQueryResult {
 	command := "stat"
+
 	args := []string{
 		query.FilePath,
 		"-c",
@@ -38,12 +39,17 @@ func (h *GetFileInfoQueryHandler) Handle(query queries.GetFileInfoQuery) (*file.
 	result := h.executor.Execute(command, args...)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return queries.GetFileInfoQueryResult{
+			Error: result.Error,
+		}
 	}
 
 	file := file.NewFileInfo(result.Stdout)
 
-	return file, nil
+	return queries.GetFileInfoQueryResult{
+		FileInfo: file,
+		Error:    nil,
+	}
 }
 
 func getCommandFullPattern() string {
