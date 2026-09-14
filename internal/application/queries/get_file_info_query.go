@@ -10,4 +10,4 @@ func NewGetFileInfoQuery(filePath string) *GetFileInfoQuery {
 	}
 }
 
-func (GetFileInfoQuery) IsQuery()
+func (GetFileInfoQuery) IsQuery() {}
