@@ -254,12 +254,12 @@ func (fs *FileSystem) Read(filePath string) (string, error) {
 }
 
 func formatCommandResult(result types.CommandResult) error {
-	if result.Error != nil {
-		return ToError(result.Error.Error())
-	}
-
 	if result.Stderr != "" {
 		return ToError(result.Stderr)
+	}
+
+	if result.Error != nil {
+		return ToError(result.Error.Error())
 	}
 
 	return nil
