@@ -29,11 +29,11 @@ func (fc *Controller) AddRoutes(registry abstractions.IHandlersRegistry) {
 func (fc *Controller) GetFileInfo(r *http.Request) (result types.HandlerResult) {
 	log := fc.loggerFactory.NewLogger("controller-GET:/files/info")
 
-	filePath := r.URL.Query().Get("filePath")
+	path := r.URL.Query().Get("path")
 
 	var queryResult getfileinfo.QueryResult
 
-	err := mediator.Dispatch(getfileinfo.NewQuery(filePath), &queryResult)
+	err := mediator.Dispatch(getfileinfo.NewQuery(path), &queryResult)
 
 	if err == nil {
 		err = queryResult.Error

@@ -1,4 +1,4 @@
-package copyfile
+package writefile
 
 import (
 	"github.com/sudzekai-web-os/abstractions"
@@ -16,12 +16,12 @@ func NewHandler(
 	fileSystem *filesystem.FileSystem,
 ) mediator.IHandler[Command, CommandResult] {
 	return Handler{
-		logger:     loggerFactory.NewLogger("handler:copy-file"),
+		logger:     loggerFactory.NewLogger("handler:write-file"),
 		fileSystem: fileSystem,
 	}
 }
 
 func (hnd Handler) Handle(cmd Command) CommandResult {
-	err := hnd.fileSystem.Copy(cmd.FilePath, cmd.DestinationPath)
+	err := hnd.fileSystem.WriteAllText(cmd.FilePath, cmd.Data)
 	return NewResult(err)
 }

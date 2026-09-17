@@ -16,7 +16,7 @@ func NewHandler(
 	fileSystem *filesystem.FileSystem,
 ) mediator.IHandler[Command, CommandResult] {
 	return Handler{
-		logger:     loggerFactory.NewLogger("handler:rename-file"),
+		logger:     loggerFactory.NewLogger("handler:move-file"),
 		fileSystem: fileSystem,
 	}
 }

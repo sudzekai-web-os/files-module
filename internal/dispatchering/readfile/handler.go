@@ -1,4 +1,4 @@
-package copyfile
+package readfile
 
 import (
 	"github.com/sudzekai-web-os/abstractions"
@@ -14,14 +14,15 @@ type Handler struct {
 func NewHandler(
 	loggerFactory abstractions.ILoggerFactory,
 	fileSystem *filesystem.FileSystem,
-) mediator.IHandler[Command, CommandResult] {
-	return Handler{
-		logger:     loggerFactory.NewLogger("handler:copy-file"),
+) mediator.IHandler[Query, QueryResult] {
+	logger := loggerFactory.NewLogger("handler:get-file-info")
+	return &Handler{
+		logger:     logger,
 		fileSystem: fileSystem,
 	}
 }
 
-func (hnd Handler) Handle(cmd Command) CommandResult {
-	err := hnd.fileSystem.Copy(cmd.FilePath, cmd.DestinationPath)
-	return NewResult(err)
+func (h *Handler) Handle(query Query) QueryResult {
+	content, err := h.fileSystem.Read(query.FilePath)
+	return NewResult(content, err)
 }

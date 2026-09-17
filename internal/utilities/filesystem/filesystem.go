@@ -237,6 +237,22 @@ func (fs *FileSystem) Copy(filePath, destinationPath string) error {
 	return nil
 }
 
+func (fs *FileSystem) Read(filePath string) (string, error) {
+	_, err := fs.Stat(filePath)
+
+	if err != nil {
+		return "", err
+	}
+
+	cmdResult := fs.executor.Execute("cat", filePath)
+
+	if err := formatCommandResult(cmdResult); err != nil {
+		return "", err
+	}
+
+	return cmdResult.Stdout, nil
+}
+
 func formatCommandResult(result types.CommandResult) error {
 	if result.Error != nil {
 		return ToError(result.Error.Error())
