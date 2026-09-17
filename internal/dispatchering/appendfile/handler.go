@@ -1,4 +1,4 @@
-package getfileinfo
+package appendfile
 
 import (
 	"github.com/sudzekai-web-os/abstractions"
@@ -14,19 +14,14 @@ type Handler struct {
 func NewHandler(
 	loggerFactory abstractions.ILoggerFactory,
 	fileSystem *filesystem.FileSystem,
-) mediator.IHandler[Query, QueryResult] {
-	logger := loggerFactory.NewLogger("handler:get-file-info")
-	return &Handler{
-		logger:     logger,
+) mediator.IHandler[Command, CommandResult] {
+	return Handler{
+		logger:     loggerFactory.NewLogger("handler:write-file"),
 		fileSystem: fileSystem,
 	}
 }
 
-func (h *Handler) Handle(query Query) QueryResult {
-	fileInfo, err := h.fileSystem.Stat(query.FilePath)
-
-	return NewResult(
-		fileInfo,
-		err,
-	)
+func (hnd Handler) Handle(cmd Command) CommandResult {
+	err := hnd.fileSystem.AppendAllText(cmd.FilePath, cmd.Data)
+	return NewResult(err)
 }

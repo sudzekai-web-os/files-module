@@ -1,4 +1,4 @@
-package getfileinfo
+package readfile
 
 import (
 	"github.com/sudzekai-web-os/abstractions"
@@ -23,10 +23,6 @@ func NewHandler(
 }
 
 func (h *Handler) Handle(query Query) QueryResult {
-	fileInfo, err := h.fileSystem.Stat(query.FilePath)
-
-	return NewResult(
-		fileInfo,
-		err,
-	)
+	content, err := h.fileSystem.Read(query.FilePath)
+	return NewResult(content, err)
 }

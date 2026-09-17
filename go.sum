@@ -2,6 +2,8 @@ github.com/sudzekai-web-os/abstractions v1.0.4 h1:9HP/aQugyuPdF5FZw1mPDE8Y19s924
 github.com/sudzekai-web-os/abstractions v1.0.4/go.mod h1:jTbeMM1CVAVvMEYorgx/YNjpGlR08jg7hupHGrDfc2w=
 github.com/sudzekai-web-os/abstractions v1.1.0 h1:ab8GXLXmiNO1nP+RWkhKGcGBxxn1GO+A7VeG3pAyaBk=
 github.com/sudzekai-web-os/abstractions v1.1.0/go.mod h1:jTbeMM1CVAVvMEYorgx/YNjpGlR08jg7hupHGrDfc2w=
+github.com/sudzekai-web-os/abstractions v1.1.1 h1:a9ePhanzlnLiNSJGwp6z9z0cZbse/XywUd2u+Q4C0Ts=
+github.com/sudzekai-web-os/abstractions v1.1.1/go.mod h1:jTbeMM1CVAVvMEYorgx/YNjpGlR08jg7hupHGrDfc2w=
 github.com/sudzekai-web-os/mediator v1.0.0 h1:jvrL3FU42eYz/CYNsRwLQ02wP5OJJTijdXsJrmfnHMw=
 github.com/sudzekai-web-os/mediator v1.0.0/go.mod h1:3zsCz3v3pc7oeJ6gvigq2BfAv/ijG8n9KCcP0SETBRE=
 github.com/sudzekai-web-os/mediator v1.0.4 h1:Ap/PdCZS6ijEOFmaLPHfFKUMleV6tcmgXVvDURvsxjg=
