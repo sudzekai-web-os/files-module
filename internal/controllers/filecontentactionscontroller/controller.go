@@ -5,29 +5,28 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sudzekai-web-os/abstractions"
+	"github.com/sudzekai-web-os/core"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/appendfile"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/readfile"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/writefile"
 	"github.com/sudzekai-web-os/files-module/internal/errformatter"
 	"github.com/sudzekai-web-os/files-module/internal/objects/dto"
 	"github.com/sudzekai-web-os/mediator"
-	"github.com/sudzekai-web-os/types"
 )
 
 type Controller struct {
-	loggerFactory abstractions.ILoggerFactory
+	loggerFactory core.ILoggerFactory
 }
 
 func New(
-	loggerFactory abstractions.ILoggerFactory,
+	loggerFactory core.ILoggerFactory,
 ) *Controller {
 	return &Controller{
 		loggerFactory: loggerFactory,
 	}
 }
 
-func (c *Controller) AddRoutes(registry abstractions.IHandlersRegistry) {
+func (c *Controller) AddRoutes(registry core.IHandlersRegistry) {
 	registry.AddHandler("POST /files/write", c.WriteFile)
 	registry.AddHandler("POST /files/append", c.AppendFile)
 	registry.AddHandler("GET /files/content", c.ReadFile)
@@ -36,7 +35,7 @@ func (c *Controller) AddRoutes(registry abstractions.IHandlersRegistry) {
 // POST /files/write?path=...
 //
 // with body
-func (c *Controller) WriteFile(r *http.Request) (result types.HandlerResult) {
+func (c *Controller) WriteFile(r *http.Request) (result core.HandlerResult) {
 	log := c.loggerFactory.NewLogger("controller-POST:files/write")
 
 	path := r.URL.Query().Get("path")
@@ -61,7 +60,7 @@ func (c *Controller) WriteFile(r *http.Request) (result types.HandlerResult) {
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusOK,
 	}
 }
@@ -69,7 +68,7 @@ func (c *Controller) WriteFile(r *http.Request) (result types.HandlerResult) {
 // POST /files/append?path=...
 //
 // with body
-func (c *Controller) AppendFile(r *http.Request) (result types.HandlerResult) {
+func (c *Controller) AppendFile(r *http.Request) (result core.HandlerResult) {
 	log := c.loggerFactory.NewLogger("controller-POST:files/append")
 
 	path := r.URL.Query().Get("path")
@@ -94,13 +93,13 @@ func (c *Controller) AppendFile(r *http.Request) (result types.HandlerResult) {
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusOK,
 	}
 }
 
 // GET /files/content?path=...
-func (c *Controller) ReadFile(r *http.Request) (result types.HandlerResult) {
+func (c *Controller) ReadFile(r *http.Request) (result core.HandlerResult) {
 	log := c.loggerFactory.NewLogger("controller-POST:files/append")
 
 	path := r.URL.Query().Get("path")
@@ -117,7 +116,7 @@ func (c *Controller) ReadFile(r *http.Request) (result types.HandlerResult) {
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusOK,
 		Data:       queryResult.Content,
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sudzekai-web-os/abstractions"
+	"github.com/sudzekai-web-os/core"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/copyfile"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/createfile"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/deletefile"
@@ -14,22 +14,21 @@ import (
 	"github.com/sudzekai-web-os/files-module/internal/errformatter"
 	"github.com/sudzekai-web-os/files-module/internal/objects/dto"
 	"github.com/sudzekai-web-os/mediator"
-	"github.com/sudzekai-web-os/types"
 )
 
 type Controller struct {
-	loggerFactory abstractions.ILoggerFactory
+	loggerFactory core.ILoggerFactory
 }
 
 func New(
-	loggerFactory abstractions.ILoggerFactory,
+	loggerFactory core.ILoggerFactory,
 ) *Controller {
 	return &Controller{
 		loggerFactory: loggerFactory,
 	}
 }
 
-func (fac *Controller) AddRoutes(registry abstractions.IHandlersRegistry) {
+func (fac *Controller) AddRoutes(registry core.IHandlersRegistry) {
 	registry.AddHandler("POST /files", fac.CreateFile)
 	registry.AddHandler("DELETE /files", fac.DeleteFile)
 	registry.AddHandler("PATCH /files/name", fac.RenameFile)
@@ -38,7 +37,7 @@ func (fac *Controller) AddRoutes(registry abstractions.IHandlersRegistry) {
 }
 
 // POST /files?path=..
-func (fac *Controller) CreateFile(r *http.Request) (result types.HandlerResult) {
+func (fac *Controller) CreateFile(r *http.Request) (result core.HandlerResult) {
 	log := fac.loggerFactory.NewLogger("controller-POST:files/")
 
 	path := r.URL.Query().Get("path")
@@ -55,13 +54,13 @@ func (fac *Controller) CreateFile(r *http.Request) (result types.HandlerResult) 
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusCreated,
 	}
 }
 
 // DELETE /files?path=..
-func (fac *Controller) DeleteFile(r *http.Request) (result types.HandlerResult) {
+func (fac *Controller) DeleteFile(r *http.Request) (result core.HandlerResult) {
 	log := fac.loggerFactory.NewLogger("controller-DELETE:files/")
 
 	path := r.URL.Query().Get("path")
@@ -78,7 +77,7 @@ func (fac *Controller) DeleteFile(r *http.Request) (result types.HandlerResult) 
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusOK,
 	}
 }
@@ -86,7 +85,7 @@ func (fac *Controller) DeleteFile(r *http.Request) (result types.HandlerResult) 
 // PATCH /files/name?path=..
 //
 // with body
-func (fac *Controller) RenameFile(r *http.Request) (result types.HandlerResult) {
+func (fac *Controller) RenameFile(r *http.Request) (result core.HandlerResult) {
 	log := fac.loggerFactory.NewLogger("controller-PATCH:files/name")
 
 	path := r.URL.Query().Get("path")
@@ -111,7 +110,7 @@ func (fac *Controller) RenameFile(r *http.Request) (result types.HandlerResult) 
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusOK,
 	}
 }
@@ -119,7 +118,7 @@ func (fac *Controller) RenameFile(r *http.Request) (result types.HandlerResult) 
 // PATCH /files/location?path=..
 //
 // with body
-func (fac *Controller) MoveFile(r *http.Request) (result types.HandlerResult) {
+func (fac *Controller) MoveFile(r *http.Request) (result core.HandlerResult) {
 	log := fac.loggerFactory.NewLogger("controller-PATCH:files/location")
 
 	path := r.URL.Query().Get("path")
@@ -144,7 +143,7 @@ func (fac *Controller) MoveFile(r *http.Request) (result types.HandlerResult) {
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusOK,
 	}
 }
@@ -152,7 +151,7 @@ func (fac *Controller) MoveFile(r *http.Request) (result types.HandlerResult) {
 // POST /files/copy?path=..
 //
 // with body
-func (fac *Controller) CopyFile(r *http.Request) (result types.HandlerResult) {
+func (fac *Controller) CopyFile(r *http.Request) (result core.HandlerResult) {
 	log := fac.loggerFactory.NewLogger("controller-POST:files/copy")
 
 	path := r.URL.Query().Get("path")
@@ -177,7 +176,7 @@ func (fac *Controller) CopyFile(r *http.Request) (result types.HandlerResult) {
 		return errformatter.MakeBusinessError(err)
 	}
 
-	return types.HandlerResult{
+	return core.HandlerResult{
 		StatusCode: http.StatusCreated,
 	}
 }

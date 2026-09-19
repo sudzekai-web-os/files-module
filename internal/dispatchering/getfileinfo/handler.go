@@ -1,18 +1,18 @@
 package getfileinfo
 
 import (
-	"github.com/sudzekai-web-os/abstractions"
+	"github.com/sudzekai-web-os/core"
 	"github.com/sudzekai-web-os/files-module/internal/utilities/filesystem"
 	"github.com/sudzekai-web-os/mediator"
 )
 
 type Handler struct {
-	logger     abstractions.ILogger
+	logger     core.ILogger
 	fileSystem *filesystem.FileSystem
 }
 
 func NewHandler(
-	loggerFactory abstractions.ILoggerFactory,
+	loggerFactory core.ILoggerFactory,
 	fileSystem *filesystem.FileSystem,
 ) mediator.IHandler[Query, QueryResult] {
 	logger := loggerFactory.NewLogger("handler:get-file-info")

@@ -3,15 +3,14 @@ package filesystem
 import (
 	"path/filepath"
 
-	"github.com/sudzekai-web-os/abstractions"
-	"github.com/sudzekai-web-os/types"
+	"github.com/sudzekai-web-os/core"
 )
 
 type FileSystem struct {
-	executor abstractions.IExecutor
+	executor core.IExecutor
 }
 
-func New(executor abstractions.IExecutor) *FileSystem {
+func New(executor core.IExecutor) *FileSystem {
 	return &FileSystem{
 		executor: executor,
 	}
@@ -253,7 +252,7 @@ func (fs *FileSystem) Read(filePath string) (string, error) {
 	return cmdResult.Stdout, nil
 }
 
-func formatCommandResult(result types.CommandResult) error {
+func formatCommandResult(result core.CommandResult) error {
 	if result.Stderr != "" {
 		return ToError(result.Stderr)
 	}
