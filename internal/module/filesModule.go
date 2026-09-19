@@ -37,7 +37,7 @@ func (m *FilesModule) Description() string {
 }
 
 func (m *FilesModule) Version() string {
-	return "v0.9.0"
+	return "v0.3.0"
 }
 
 func (m *FilesModule) Start() error {
