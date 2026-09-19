@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sudzekai-web-os/core"
 	"github.com/sudzekai-web-os/files-module/internal/utilities/filesystem"
-	"github.com/sudzekai-web-os/types"
 )
 
-var errors = map[error]types.HandlerResult{
+var errors = map[error]core.HandlerResult{
 	filesystem.ErrorAlreadyExists: {
 		StatusCode: http.StatusConflict,
 		Error:      fmt.Errorf("файл уже существует"),
@@ -103,12 +103,12 @@ var errors = map[error]types.HandlerResult{
 	},
 }
 
-var defaultErr = types.HandlerResult{
+var defaultErr = core.HandlerResult{
 	StatusCode: http.StatusInternalServerError,
 	Error:      fmt.Errorf("неизвестная ошибка сервера"),
 }
 
-func MakeBusinessError(err error) types.HandlerResult {
+func MakeBusinessError(err error) core.HandlerResult {
 	if result, exists := errors[err]; exists {
 		return result
 	}

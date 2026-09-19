@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/sudzekai-web-os/abstractions"
+	"github.com/sudzekai-web-os/core"
 	"github.com/sudzekai-web-os/files-module/internal/controllers/fileactionscontroller"
 	"github.com/sudzekai-web-os/files-module/internal/controllers/filecontentactionscontroller"
 	"github.com/sudzekai-web-os/files-module/internal/controllers/filescontroller"
@@ -19,9 +19,12 @@ import (
 )
 
 type FilesModule struct {
+	registry      core.IHandlersRegistry
+	loggerFactory core.ILoggerFactory
+	executor      core.IExecutor
 }
 
-func NewFilesModule() abstractions.IModule {
+func NewFilesModule() *FilesModule {
 	return &FilesModule{}
 }
 
@@ -34,26 +37,34 @@ func (m *FilesModule) Description() string {
 }
 
 func (m *FilesModule) Version() string {
-	return "v0.9.0"
+	return "v0.3.0"
 }
 
-func (m *FilesModule) Initialize(
-	registry abstractions.IHandlersRegistry,
-	loggerFactory abstractions.ILoggerFactory,
-	executor abstractions.IExecutor,
-) error {
-	fileSystem := filesystem.New(executor)
+func (m *FilesModule) Start() error {
+	fileSystem := filesystem.New(m.executor)
 
-	configureFilesControllerChain(registry, loggerFactory, fileSystem)
-	configureFileActionsControllerChain(registry, loggerFactory, fileSystem)
-	configureFileContentActionsControllerChain(registry, loggerFactory, fileSystem)
+	configureFilesControllerChain(m.registry, m.loggerFactory, fileSystem)
+	configureFileActionsControllerChain(m.registry, m.loggerFactory, fileSystem)
+	configureFileContentActionsControllerChain(m.registry, m.loggerFactory, fileSystem)
 
 	return nil
 }
 
+func (m *FilesModule) AddHandlersRegistry(registry core.IHandlersRegistry) {
+	m.registry = registry
+}
+
+func (m *FilesModule) AddLoggerFactory(loggerFactory core.ILoggerFactory) {
+	m.loggerFactory = loggerFactory
+}
+
+func (m *FilesModule) AddExecutor(executor core.IExecutor) {
+	m.executor = executor
+}
+
 func configureFilesControllerChain(
-	registry abstractions.IHandlersRegistry,
-	loggerFactory abstractions.ILoggerFactory,
+	registry core.IHandlersRegistry,
+	loggerFactory core.ILoggerFactory,
 	fileSystem *filesystem.FileSystem,
 ) {
 	mediator.RegisterHandler(getfileinfo.NewHandler(loggerFactory, fileSystem))
@@ -64,8 +75,8 @@ func configureFilesControllerChain(
 }
 
 func configureFileActionsControllerChain(
-	registry abstractions.IHandlersRegistry,
-	loggerFactory abstractions.ILoggerFactory,
+	registry core.IHandlersRegistry,
+	loggerFactory core.ILoggerFactory,
 	fileSystem *filesystem.FileSystem,
 ) {
 	mediator.RegisterHandler(createfile.NewHandler(loggerFactory, fileSystem))
@@ -80,8 +91,8 @@ func configureFileActionsControllerChain(
 }
 
 func configureFileContentActionsControllerChain(
-	registry abstractions.IHandlersRegistry,
-	loggerFactory abstractions.ILoggerFactory,
+	registry core.IHandlersRegistry,
+	loggerFactory core.ILoggerFactory,
 	fileSystem *filesystem.FileSystem,
 ) {
 	mediator.RegisterHandler(appendfile.NewHandler(loggerFactory, fileSystem))

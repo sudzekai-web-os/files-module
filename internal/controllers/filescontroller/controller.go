@@ -3,30 +3,29 @@ package filescontroller
 import (
 	"net/http"
 
-	"github.com/sudzekai-web-os/abstractions"
+	"github.com/sudzekai-web-os/core"
 	"github.com/sudzekai-web-os/files-module/internal/dispatchering/getfileinfo"
 	"github.com/sudzekai-web-os/files-module/internal/errformatter"
 	"github.com/sudzekai-web-os/mediator"
-	"github.com/sudzekai-web-os/types"
 )
 
 type Controller struct {
-	loggerFactory abstractions.ILoggerFactory
+	loggerFactory core.ILoggerFactory
 }
 
 func New(
-	loggerFactory abstractions.ILoggerFactory,
+	loggerFactory core.ILoggerFactory,
 ) *Controller {
 	return &Controller{
 		loggerFactory: loggerFactory,
 	}
 }
 
-func (fc *Controller) AddRoutes(registry abstractions.IHandlersRegistry) {
+func (fc *Controller) AddRoutes(registry core.IHandlersRegistry) {
 	registry.AddHandler("GET /files/info", fc.GetFileInfo)
 }
 
-func (fc *Controller) GetFileInfo(r *http.Request) (result types.HandlerResult) {
+func (fc *Controller) GetFileInfo(r *http.Request) (result core.HandlerResult) {
 	log := fc.loggerFactory.NewLogger("controller-GET:/files/info")
 
 	path := r.URL.Query().Get("path")
