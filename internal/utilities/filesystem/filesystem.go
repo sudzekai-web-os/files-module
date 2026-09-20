@@ -2,6 +2,8 @@ package filesystem
 
 import (
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/sudzekai-web-os/core"
 )
@@ -41,19 +43,21 @@ func (fs *FileSystem) Create(filePath string) error {
 	return nil
 }
 
-// Deletes file if exists
-//
-// Errors:
-//
-//	-
+// Deletes file or directory if exists.
 func (fs *FileSystem) Delete(filePath string) error {
-	_, err := fs.Stat(filePath)
+	fi, err := fs.Stat(filePath)
 
 	if err != nil {
 		return err
 	}
 
-	cmdResult := fs.executor.Execute("rm", filePath)
+	var cmdResult core.CommandResult
+
+	if fi.Type == TypeDirectory {
+		cmdResult = fs.executor.Execute("rm", "-r", filePath)
+	} else {
+		cmdResult = fs.executor.Execute("rm", filePath)
+	}
 
 	if err := formatCommandResult(cmdResult); err != nil {
 		return err
@@ -62,7 +66,7 @@ func (fs *FileSystem) Delete(filePath string) error {
 	return nil
 }
 
-// Returns bool value representing file existance.
+// Returns bool value representing file or directory existance.
 //
 // Errors:
 //   - ErrorAbsolutePath
@@ -85,19 +89,17 @@ func (fs *FileSystem) Exists(filePath string) (bool, error) {
 	return false, ToError(result.Stderr)
 }
 
-// Stat returns information about the specified file.
+// Stat returns information about the specified file or directory.
 //
 // Errors:
 //   - ErrorAbsolutePath
 //   - ErrorNotFound
 //   - ErrorPermissionDenied
-//   - ErrorNotDirectory
 //   - ErrorTooManySymlinks
 //   - ErrorNameTooLong
 //   - ErrorOverflow
 //   - ErrorOutOfMemory
 //   - ErrorIO
-//   - ErrorIsDirectory
 //   - Unknown error with provided output
 func (fs *FileSystem) Stat(filePath string) (*FileInfo, error) {
 	if !IsAbsolute(filePath) {
@@ -115,35 +117,45 @@ func (fs *FileSystem) Stat(filePath string) (*FileInfo, error) {
 	fi := NewFileInfo(cmdResult.Stdout)
 
 	if fi.Type == TypeDirectory {
-		return nil, ErrorIsDirectory
+		fi.FullName = filePath
+
+		cmdResult = fs.executor.Execute("du", "-s", "-B1", filePath)
+
+		if cmdResult.Stdout == "" {
+			if err := formatCommandResult(cmdResult); err != nil {
+				return nil, err
+			}
+		}
+
+		value, _ := strconv.ParseInt(strings.Fields(cmdResult.Stdout)[0], 10, 64)
+
+		if value != 0 {
+			fi.Size = value
+		}
 	}
 
 	return fi, nil
 }
 
 func (fs *FileSystem) IsDir(filePath string) (bool, error) {
-	_, err := fs.Stat(filePath)
+	fi, err := fs.Stat(filePath)
 
-	if err == nil {
-		return false, nil
+	if err != nil {
+		return false, err
 	}
 
-	if err == ErrorIsDirectory {
-		return true, nil
-	}
-
-	return false, err
+	return fi.Type == TypeDirectory, nil
 }
 
 func (fs *FileSystem) WriteAllText(filePath, data string) error {
-	exists, err := fs.Exists(filePath)
+	fi, err := fs.Stat(filePath)
 
 	if err != nil {
 		return err
 	}
 
-	if !exists {
-		return ErrorNotFound
+	if fi.Type == TypeDirectory {
+		return ErrorIsDirectory
 	}
 
 	cmdResult := fs.executor.ExecuteWithInput(data, "tee", filePath)
@@ -156,14 +168,14 @@ func (fs *FileSystem) WriteAllText(filePath, data string) error {
 }
 
 func (fs *FileSystem) AppendAllText(filePath, data string) error {
-	exists, err := fs.Exists(filePath)
+	fi, err := fs.Stat(filePath)
 
 	if err != nil {
 		return err
 	}
 
-	if !exists {
-		return ErrorNotFound
+	if fi.Type == TypeDirectory {
+		return ErrorIsDirectory
 	}
 
 	cmdResult := fs.executor.ExecuteWithInput(data, "tee", "-a", filePath)
@@ -211,7 +223,7 @@ func (fs *FileSystem) Copy(filePath, destinationPath string) error {
 		return ErrorAbsolutePath
 	}
 
-	_, err := fs.Stat(filePath)
+	fi, err := fs.Stat(filePath)
 
 	if err != nil {
 		return err
@@ -227,7 +239,13 @@ func (fs *FileSystem) Copy(filePath, destinationPath string) error {
 		return ErrorAlreadyExists
 	}
 
-	cmdResult := fs.executor.Execute("cp", filePath, destinationPath)
+	var cmdResult core.CommandResult
+
+	if fi.Type == TypeDirectory {
+		cmdResult = fs.executor.Execute("cp", "-r", filePath, destinationPath)
+	} else {
+		cmdResult = fs.executor.Execute("cp", filePath, destinationPath)
+	}
 
 	if err := formatCommandResult(cmdResult); err != nil {
 		return err
@@ -237,10 +255,14 @@ func (fs *FileSystem) Copy(filePath, destinationPath string) error {
 }
 
 func (fs *FileSystem) Read(filePath string) (string, error) {
-	_, err := fs.Stat(filePath)
+	fi, err := fs.Stat(filePath)
 
 	if err != nil {
 		return "", err
+	}
+
+	if fi.Type == TypeDirectory {
+		return "", ErrorIsDirectory
 	}
 
 	cmdResult := fs.executor.Execute("cat", filePath)
