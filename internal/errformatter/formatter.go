@@ -19,7 +19,7 @@ var errors = map[error]core.HandlerResult{
 	},
 	filesystem.ErrorNotFound: {
 		StatusCode: http.StatusNotFound,
-		Error:      fmt.Errorf("такого файла не существует"),
+		Error:      fmt.Errorf("указанный файл не существует"),
 	},
 	filesystem.ErrorPermissionDenied: {
 		StatusCode: http.StatusForbidden,
@@ -27,7 +27,7 @@ var errors = map[error]core.HandlerResult{
 	},
 	filesystem.ErrorNotDirectory: {
 		StatusCode: http.StatusBadRequest,
-		Error:      fmt.Errorf("указанный путь содержит некорректный каталог"),
+		Error:      fmt.Errorf("указанный путь не является каталогом"),
 	},
 	filesystem.ErrorTooManySymlinks: {
 		StatusCode: http.StatusBadRequest,
@@ -100,6 +100,22 @@ var errors = map[error]core.HandlerResult{
 	filesystem.ErrorDirectoryNotEmpty: {
 		StatusCode: http.StatusConflict,
 		Error:      fmt.Errorf("каталог не пуст"),
+	},
+	filesystem.ErrorTooManyLinks: {
+		StatusCode: http.StatusConflict,
+		Error:      fmt.Errorf("превышено количество ссылок"),
+	},
+	filesystem.ErrorNoSuchDevice: {
+		StatusCode: http.StatusNotFound,
+		Error:      fmt.Errorf("устройство не найдено"),
+	},
+	filesystem.ErrorNoSuchDeviceOrAddress: {
+		StatusCode: http.StatusNotFound,
+		Error:      fmt.Errorf("устройство или адрес не найден"),
+	},
+	filesystem.ErrorStaleFileHandle: {
+		StatusCode: http.StatusInternalServerError,
+		Error:      fmt.Errorf("файловый дескриптор устарел"),
 	},
 }
 

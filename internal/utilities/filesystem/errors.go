@@ -29,6 +29,10 @@ var (
 	ErrorFileTooLarge          = fmt.Errorf("File too large")
 	ErrorCrossDevice           = fmt.Errorf("Invalid cross-device link")
 	ErrorDirectoryNotEmpty     = fmt.Errorf("Directory not empty")
+	ErrorTooManyLinks          = fmt.Errorf("Too many links")
+	ErrorNoSuchDevice          = fmt.Errorf("No such device")
+	ErrorNoSuchDeviceOrAddress = fmt.Errorf("No such device or address")
+	ErrorStaleFileHandle       = fmt.Errorf("Stale file handle")
 )
 
 var errors = map[string]error{
@@ -54,6 +58,11 @@ var errors = map[string]error{
 	"File too large":                        ErrorFileTooLarge,
 	"Invalid cross-device link":             ErrorCrossDevice,
 	"Directory not empty":                   ErrorDirectoryNotEmpty,
+	"Too many links":                        ErrorTooManyLinks,
+	"No such device":                        ErrorNoSuchDevice,
+	"No such device or address":             ErrorNoSuchDeviceOrAddress,
+	"Stale file handle":                     ErrorStaleFileHandle,
+	"File exists":                           ErrorAlreadyExists,
 }
 
 func ToError(stdErr string) error {
